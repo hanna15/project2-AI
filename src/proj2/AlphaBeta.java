@@ -1,6 +1,7 @@
 package proj2;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class AlphaBeta {
 	static final int MAX = 100;
@@ -26,10 +27,12 @@ public class AlphaBeta {
 	
 	Move bestMove() { 
 		ArrayList<Move> moves = currState.getAllLegalMoves(envWidth, envHeight);
+		//Collections.shuffle(moves);
 		System.out.println("-----------size of legal moves: " + moves.size());
 		int max_val = MIN;
 		Move max_move = null;
-		for (Move m : currState.getAllLegalMoves(envWidth, envHeight)) {
+		// moves should not be empty
+		for (Move m : moves) {
 			int val = minValue(currState.successorState(m), MIN, MAX); //synist ekki skipta mali hvort byrjum a min eda max
 			//System.out.println("-----------val is : " + val);
 			if (val >= max_val) {
@@ -44,14 +47,16 @@ public class AlphaBeta {
 
 	private int minValue(State s, int alpha_min, int beta_max) {
 		int value = MAX;
-		if(s.isGoalState(envHeight)) { //veit hann potto "who's turn it is ?"
+		if(s.isGoalState(envWidth, envHeight)) { //veit hann potto "who's turn it is ?"
 			 if (s.isWhite && myRole.equals("white") || !s.isWhite && myRole.equals("black")) { //if we are the winners
 				 return 100; 
 			 }
 			 else if(s.isWhite && myRole.equals("black") || !s.isWhite && myRole.equals("white")) { //if we are the loosers
-				 return -100;
+				 return 0;
 			 }
-			 return 0; //??? when would we really return 0 ?
+			 else {
+				 return 50; //??? when would we really return 0 ?
+			 }
 		} 
 		//value = MAX;
 		for (Move m : s.getAllLegalMoves(envWidth, envHeight)) {
@@ -66,14 +71,16 @@ public class AlphaBeta {
 	
 	private int maxValue(State s, int alpha_min, int beta_max) {
 		int value = MIN;
-		if(s.isGoalState(envHeight)) { //veit hann potto "who's turn it is ?"
+		if(s.isGoalState(envWidth, envHeight)) { //veit hann potto "who's turn it is ?"
 			 if (s.isWhite && myRole.equals("white") || !s.isWhite && myRole.equals("black")) { //if we are the winners
 				 return 100; 
 			 }
 			 else if(s.isWhite && myRole.equals("black") || !s.isWhite && myRole.equals("white")) { //if we are the loosers
-				 return -100;
+				 return 0;
 			 }
-			 return 0; //??? when would we really return 0 ?
+			 else {
+				 return 50; //??? when would we really return 0 
+			 }
 		} 
 		//value = MIN;
 		for (Move m : s.getAllLegalMoves(envWidth, envHeight)) {
