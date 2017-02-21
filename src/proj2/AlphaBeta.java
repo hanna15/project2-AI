@@ -2,6 +2,7 @@ package proj2;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Set;
 
 public class AlphaBeta {
 	static final int MAX = 100;
@@ -29,19 +30,26 @@ public class AlphaBeta {
 	Move bestMove() { 
 		stats = new Stats(); // Set the starting time
 
-		ArrayList<Move> moves = currState.getAllLegalMoves(envWidth, envHeight);
-		//Collections.shuffle(moves);
+		Set<Move> moves = currState.getAllLegalMoves(envWidth, envHeight);
 		System.out.println("-----------size of legal moves: " + moves.size());
 		int max_val = MIN;
 		Move max_move = null;
 		// moves should not be empty
+		int bestVal = maxValue(currState, MIN, MAX);
+		int counter = 0;
 		for (Move m : moves) {
+			counter += 1;
 			int val = minValue(currState.successorState(m), MIN, MAX); //synist ekki skipta mali hvort byrjum a min eda max
 			//System.out.println("-----------val is : " + val);
-			if (val >= max_val) {
-				//System.out.println("------------in if----------------");
-				max_val = val;
-				max_move = m;
+//			if (val >= max_val) {
+//				//System.out.println("------------in if----------------");
+//				max_val = val;
+//				max_move = m;
+//			}
+			if (val == bestVal) {
+				System.out.println(" counter: " + counter + " moves size " + moves.size());
+				stats.print();
+				return m;
 			}
 		}
 		stats.print();
@@ -59,7 +67,7 @@ public class AlphaBeta {
 				 return 0;
 			 }
 			 else {
-				 return 50; //??? when would we really return 0 ?
+				 return 50; // draw 
 			 }
 		} 
 		//value = MAX;
@@ -83,7 +91,7 @@ public class AlphaBeta {
 				 return 0;
 			 }
 			 else {
-				 return 50; //??? when would we really return 0 
+				 return 50; //draw
 			 }
 		} 
 		//value = MIN;
@@ -96,4 +104,6 @@ public class AlphaBeta {
 		}
 		return value;
 	}
+	
+	
 }
