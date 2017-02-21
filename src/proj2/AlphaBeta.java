@@ -32,35 +32,37 @@ public class AlphaBeta {
 
 		Set<Move> moves = currState.getAllLegalMoves(envWidth, envHeight);
 		System.out.println("-----------size of legal moves: " + moves.size());
-		int max_val = MIN;
-		Move max_move = null;
 		// moves should not be empty
 		int bestVal = maxValue(currState, MIN, MAX);
 		int counter = 0;
+		if (moves.isEmpty()) {
+			System.out.println("this should never happen");
+			System.out.println("moves is empty, state is: " + currState.toString());
+		}
+		int val = 0;
 		for (Move m : moves) {
 			counter += 1;
-			int val = minValue(currState.successorState(m), MIN, MAX); //synist ekki skipta mali hvort byrjum a min eda max
-			//System.out.println("-----------val is : " + val);
-//			if (val >= max_val) {
-//				//System.out.println("------------in if----------------");
-//				max_val = val;
-//				max_move = m;
-//			}
+			val = minValue(currState.successorState(m), MIN, MAX); //synist ekki skipta mali hvort byrjum a min eda max
 			if (val == bestVal) {
-				System.out.println(" counter: " + counter + " moves size " + moves.size());
+				//System.out.println(" counter: " + counter + " moves size " + moves.size());
 				stats.print();
 				return m;
 			}
 		}
-		stats.print();
-		return max_move;
+		//System.out.println("best val " + bestVal + " val: " + val);
+		//System.out.println("hvad ertu ad gera her???? ");
+		return null;
+		//stats.print();
+		//return max_move;
 		//System.out.println("---max move is--- : " + max_move);
 	}
 
 	private int minValue(State s, int alpha_min, int beta_max) {
 		int value = MAX;
+		
 		if(s.isGoalState(envWidth, envHeight)) { //veit hann potto "who's turn it is ?"
-			 if (s.isWhite && myRole.equals("white") || !s.isWhite && myRole.equals("black")) { //if we are the winners
+			//System.out.println("state: " + s.toString()); 
+			if (s.isWhite && myRole.equals("white") || !s.isWhite && myRole.equals("black")) { //if we are the winners
 				 return 100; 
 			 }
 			 else if(s.isWhite && myRole.equals("black") || !s.isWhite && myRole.equals("white")) { //if we are the loosers
@@ -84,7 +86,8 @@ public class AlphaBeta {
 	private int maxValue(State s, int alpha_min, int beta_max) {
 		int value = MIN;
 		if(s.isGoalState(envWidth, envHeight)) { //veit hann potto "who's turn it is ?"
-			 if (s.isWhite && myRole.equals("white") || !s.isWhite && myRole.equals("black")) { //if we are the winners
+			//System.out.println("state: " + s.toString()); 
+			if (s.isWhite && myRole.equals("white") || !s.isWhite && myRole.equals("black")) { //if we are the winners
 				 return 100; 
 			 }
 			 else if(s.isWhite && myRole.equals("black") || !s.isWhite && myRole.equals("white")) { //if we are the loosers

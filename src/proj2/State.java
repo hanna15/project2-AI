@@ -69,11 +69,13 @@ public class State {
 	
 	boolean isGoalState(int width, int height) {
 		if(isDraw(width, height)) {
+			//System.out.println("Goal state: its a draw");
 			return true;
 		}
 		if(isWhite) {
 			for (Position p: whites) {
 				if(p.getY() == height) { //if at least one pawn has reached the end height (whites start at 1)
+					//System.out.println("Goal state: white");
 					return true;
 				}
 			}
@@ -81,6 +83,7 @@ public class State {
 		else {
 			for (Position p: blacks) { 
 				if(p.getY() == 1) { //if at least one pawn has reached tile height 1 (blacks start at height = height)
+					//System.out.println("Goal state: black");
 					return true;
 				}
 			}
@@ -129,13 +132,27 @@ public class State {
         return (this.whites.equals(that.whites) && this.blacks.equals(that.blacks) && this.isWhite == that.isWhite);
 	}
 	
+	@Override
+	public String toString() {
+		if (isWhite) {
+			return "state is white \n whites: " + whites.toString() + "\n blacks: " + blacks.toString();
+		}
+		return "state is black \n blacks: " + blacks.toString() + "\n whites: " + whites.toString();
+	}
+	
 	public boolean isDraw(int width, int height) {
 		Set<Move> myMoves = getAllLegalMoves(width, height);
-		isWhite = !isWhite;
-		Set<Move> opponentMoves = getAllLegalMoves(width, height);
-		isWhite = !isWhite;
-		
-		if (myMoves.isEmpty() || opponentMoves.isEmpty() || blacks.isEmpty() || whites.isEmpty()) {
+		boolean pawnsEmpty = false;
+		if (isWhite) {
+			pawnsEmpty =  whites.isEmpty();	
+		}
+		else {
+			pawnsEmpty = blacks.isEmpty();
+		}
+		//System.out.println("pawns empty is " + pawnsEmpty);
+		//System.out.println("all legal moves is: " + myMoves.toString());
+		//System.out.println("is empty " + myMoves.isEmpty() + "mymoves size " + myMoves.size());
+		if (pawnsEmpty || myMoves == null || myMoves.size() == 0) {
 			return true;
 		}
 		
