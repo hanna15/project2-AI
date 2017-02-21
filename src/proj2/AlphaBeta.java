@@ -6,6 +6,7 @@ import java.util.Collections;
 public class AlphaBeta {
 	static final int MAX = 100;
 	static final int MIN = 0;
+	private Stats stats = null;
 	
 	//svo depth og playclock, startclock etc
 	//private int value;
@@ -26,6 +27,8 @@ public class AlphaBeta {
 	}
 	
 	Move bestMove() { 
+		stats = new Stats(); // Set the starting time
+
 		ArrayList<Move> moves = currState.getAllLegalMoves(envWidth, envHeight);
 		//Collections.shuffle(moves);
 		System.out.println("-----------size of legal moves: " + moves.size());
@@ -41,6 +44,7 @@ public class AlphaBeta {
 				max_move = m;
 			}
 		}
+		stats.print();
 		return max_move;
 		//System.out.println("---max move is--- : " + max_move);
 	}
