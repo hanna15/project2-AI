@@ -65,8 +65,7 @@ public class State {
         return true;
 	}
 	
-	// TODO: replace goal test with ctoff test that decides when to apply EVAL
-	
+	// TODO: replace goal test with cutoff test that decides when to apply EVAL
 	boolean isGoalState(int width, int height) {
 		if(isDraw(width, height)) {
 			//System.out.println("Goal state: its a draw");
@@ -117,6 +116,37 @@ public class State {
 		return nextState;
 	}
 	
+	/* 
+	 * Implement a state evaluation function for the game. You can start with the following simple evaluation function for white 
+	 * (and use the negation for black): 50 - distance of most advanced white pawn to row H + distance of most advanced black pawn 
+	 * to row 1
+	 */
+	public int eval(int distWToH, int distBTo1) {
+		if (isWhite) {
+			return 50 - distWToH + distBTo1;
+		}
+		return 100 - (50 - distWToH + distBTo1);
+	}
+	
+	public boolean isDraw(int width, int height) {
+		Set<Move> myMoves = getAllLegalMoves(width, height);
+		boolean pawnsEmpty = false;
+		if (isWhite) {
+			pawnsEmpty =  whites.isEmpty();	
+		}
+		else {
+			pawnsEmpty = blacks.isEmpty();
+		}
+		//System.out.println("pawns empty is " + pawnsEmpty);
+		//System.out.println("all legal moves is: " + myMoves.toString());
+		//System.out.println("is empty " + myMoves.isEmpty() + "mymoves size " + myMoves.size());
+		if (pawnsEmpty || myMoves == null || myMoves.size() == 0) {
+			return true;
+		}
+		
+		return false;
+	}
+	
 	@Override
 	public boolean equals(Object other) {
 		if (other == this) {
@@ -138,24 +168,5 @@ public class State {
 			return "state is white \n whites: " + whites.toString() + "\n blacks: " + blacks.toString();
 		}
 		return "state is black \n blacks: " + blacks.toString() + "\n whites: " + whites.toString();
-	}
-	
-	public boolean isDraw(int width, int height) {
-		Set<Move> myMoves = getAllLegalMoves(width, height);
-		boolean pawnsEmpty = false;
-		if (isWhite) {
-			pawnsEmpty =  whites.isEmpty();	
-		}
-		else {
-			pawnsEmpty = blacks.isEmpty();
-		}
-		//System.out.println("pawns empty is " + pawnsEmpty);
-		//System.out.println("all legal moves is: " + myMoves.toString());
-		//System.out.println("is empty " + myMoves.isEmpty() + "mymoves size " + myMoves.size());
-		if (pawnsEmpty || myMoves == null || myMoves.size() == 0) {
-			return true;
-		}
-		
-		return false;
 	}
 }

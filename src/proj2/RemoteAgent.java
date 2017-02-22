@@ -85,24 +85,6 @@ public class RemoteAgent implements Agent {
 	@Override
 	public void cleanup() {
 		// TODO: cleanup so that the agent is ready for the next match
-//		this.role = " ";
-//		this.playclock = playclock;
-//		myTurn = !role.equals("white");
-//		this.width = width;
-//		this.height = height;
-//		HashSet<Position> whites = new HashSet<Position>();
-//		HashSet<Position> blacks = new HashSet<Position>();
-//		for (int i = 1; i < this.width; i++) {
-//			Position posW1 = new Position(i,1);
-//			Position posW2 = new Position(i,2);
-//			whites.add(posW1);
-//			whites.add(posW2);
-//			Position posB1 = new Position(i, this.height);
-//			Position posB2 = new Position(i, this.height - 1);
-//			blacks.add(posB1);
-//			blacks.add(posB2);
-//		}
-//		this.currState = new State(whites, blacks, true);
-//		
+	
 	}
 }

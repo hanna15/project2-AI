@@ -1,4 +1,5 @@
 package proj2;
+
 import java.util.Random;
 
 public class RandomAgent implements Agent
