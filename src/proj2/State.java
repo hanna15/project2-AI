@@ -1,5 +1,6 @@
 package proj2;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -15,8 +16,9 @@ public class State {
 		isWhite = player;
 	}
 	
-	Set<Move> getAllLegalMoves(int width, int height) {
-		Set<Move> legalMoves = new HashSet<Move>();
+	ArrayList<Move> getAllLegalMoves(int width, int height) {
+		//Set<Move> legalMoves = new HashSet<Move>();
+		ArrayList<Move> legalMoves = new ArrayList<Move>();
 		if(isWhite) {
 			for (Position p : whites) {
 				//try go forward
@@ -67,10 +69,12 @@ public class State {
 	
 	// TODO: replace goal test with cutoff test that decides when to apply EVAL
 	boolean isGoalState(int width, int height) {
+		/*
 		if(isDraw(width, height)) {
 			//System.out.println("Goal state: its a draw");
 			return true;
 		}
+        */
 		if(isWhite) {
 			for (Position p: whites) {
 				if(p.getY() == height) { //if at least one pawn has reached the end height (whites start at 1)
@@ -113,6 +117,7 @@ public class State {
 			succBlack.add(move.getDest());
 		}
 		State nextState = new State(succWhite, succBlack, !isWhite);
+		//System.out.println("SUCCESSOR STATE: " + nextState);
 		return nextState;
 	}
 	
@@ -129,7 +134,7 @@ public class State {
 	}
 	
 	public boolean isDraw(int width, int height) {
-		Set<Move> myMoves = getAllLegalMoves(width, height);
+		ArrayList<Move> myMoves = getAllLegalMoves(width, height);
 		boolean pawnsEmpty = false;
 		if (isWhite) {
 			pawnsEmpty =  whites.isEmpty();	

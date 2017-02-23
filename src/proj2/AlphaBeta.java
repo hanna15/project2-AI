@@ -8,104 +8,118 @@ public class AlphaBeta {
 	static final int MAX = 100;
 	static final int MIN = 0;
 	private Stats stats = null;
-	
-	//svo depth og playclock, startclock etc
-	//private int value;
+	static final long cutOff = 1000;
 	private int envWidth;
 	private int envHeight;
 	private State currState;
 	private String myRole;
+	private best best;
+	
+	public class best {
+		int bestVal;
+		Move bestMove;
+		
+		best(int value, Move move) {
+			bestVal = value;
+			bestMove = move;
+		}
+	}
 	
 	AlphaBeta(int w, int h, State curr, String role) {
 		currState = curr;
 		envWidth = w;
 		envHeight = h;
 		myRole = role;
-		//value = 0;
-		//value = maxValue(currState, MIN, MAX);
-		//return the action in ACTIONS(state) with value v
-		//bestMove();
+		best = new best(0, null);
 	}
 	
 	Move bestMove() { 
 		stats = new Stats(); // Set the starting time
-
-		Set<Move> moves = currState.getAllLegalMoves(envWidth, envHeight);
+		ArrayList<Move> moves = currState.getAllLegalMoves(envWidth, envHeight);
 		System.out.println("-----------size of legal moves: " + moves.size());
 		// moves should not be empty
-		int bestVal = maxValue(currState, MIN, MAX);
-		int counter = 0;
-		if (moves.isEmpty()) {
-			System.out.println("this should never happen");
-			System.out.println("moves is empty, state is: " + currState.toString());
+		Move bestMove = maxValue(currState, MIN, MAX, null).bestMove;
+		stats.print();
+		if(bestMove == null) {
+			System.out.println("------------ATH! Best move is null -----------------");
 		}
-		int val = 0;
-		for (Move m : moves) {
-			counter += 1;
-			val = minValue(currState.successorState(m), MIN, MAX); //synist ekki skipta mali hvort byrjum a min eda max
-			if (val == bestVal) {
-				//System.out.println(" counter: " + counter + " moves size " + moves.size());
-				stats.print();
-				return m;
-			}
-		}
-		//System.out.println("best val " + bestVal + " val: " + val);
-		//System.out.println("hvad ertu ad gera her???? ");
-		return null;
-		//stats.print();
-		//return max_move;
-		//System.out.println("---max move is--- : " + max_move);
+		return bestMove;
 	}
 
-	private int minValue(State s, int alpha_min, int beta_max) {
+	private best minValue(State s, int alpha_min, int beta_max, Move bestMove) {
 		int value = MAX;
-		
 		if(s.isGoalState(envWidth, envHeight)) { //veit hann potto "who's turn it is ?"
-			//System.out.println("state: " + s.toString()); 
-			if (s.isWhite && myRole.equals("white") || !s.isWhite && myRole.equals("black")) { //if we are the winners
-				 return 100; 
-			 }
-			 else if(s.isWhite && myRole.equals("black") || !s.isWhite && myRole.equals("white")) { //if we are the loosers
-				 return 0;
-			 }
-			 else {
-				 return 50; // draw 
-			 }
-		} 
-		//value = MAX;
+			//System.out.println("goal state from min : " + s.toString());
+			best.bestVal = utility(s);
+			best.bestMove = bestMove;
+			return best; 
+		}
 		for (Move m : s.getAllLegalMoves(envWidth, envHeight)) {
-			value = Math.min(value, maxValue(s.successorState(m), alpha_min, beta_max));
+			value = Math.min(value, maxValue(s.successorState(m), alpha_min, beta_max, m).bestVal);
 			if(value <= alpha_min) {
-				return value;
+				best.bestVal = value;
+				best.bestMove = m;
+				return best;
 			}
 			beta_max = Math.min(beta_max, value);
 		}
-		return value;
+		best.bestVal = value;
+		best.bestMove = bestMove;
+		return best;
 	}
 	
-	private int maxValue(State s, int alpha_min, int beta_max) {
+	private best maxValue(State s, int alpha_min, int beta_max, Move bestMove) {
 		int value = MIN;
 		if(s.isGoalState(envWidth, envHeight)) { //veit hann potto "who's turn it is ?"
-			//System.out.println("state: " + s.toString()); 
-			if (s.isWhite && myRole.equals("white") || !s.isWhite && myRole.equals("black")) { //if we are the winners
-				 return 100; 
-			 }
-			 else if(s.isWhite && myRole.equals("black") || !s.isWhite && myRole.equals("white")) { //if we are the loosers
-				 return 0;
-			 }
-			 else {
-				 return 50; //draw
-			 }
-		} 
-		//value = MIN;
+			//System.out.println("goal state from max : " + s.toString());
+			best.bestVal = utility(s);
+			best.bestMove = bestMove;
+			return best; 
+		}
 		for (Move m : s.getAllLegalMoves(envWidth, envHeight)) {
-			value = Math.max(value, minValue(s.successorState(m), alpha_min, beta_max));
+			value = Math.max(value, minValue(s.successorState(m), alpha_min, beta_max, m).bestVal);
 			if(value >= beta_max) {
-				return value;
+				best.bestVal = value;
+				best.bestMove = m;
+				return best;
 			}
 			alpha_min = Math.max(alpha_min, value);
 		}
-		return value;
+		best.bestVal = value;
+		best.bestMove = bestMove;
+		return best;
 	}
 	
+	private int heuristic(State s) {
+		int whiteDist = envHeight;
+		int blackDist = 1;
+		for (Position p : s.whites) {
+			if(p.getY() < whiteDist) {
+				whiteDist = envHeight - p.getY();
+			}
+		}
+		for (Position p : s.blacks) {
+			if(p.getY() > blackDist) {
+				blackDist = p.getY();
+			}
+		}
+		if (s.isWhite) {
+			return 50 - whiteDist + blackDist;
+		}
+		else {
+			return 50 + whiteDist - blackDist;
+		}
+	}
+	
+	private int utility(State s) {
+		if (s.isWhite && myRole.equals("white") || !s.isWhite && myRole.equals("black")) { //if we are the winners
+			 return 100; 
+		 }
+		 else if(s.isWhite && myRole.equals("black") || !s.isWhite && myRole.equals("white")) { //if we are the loosers
+			 return 0;
+		 }
+		 else {
+			 return 50; //draw
+		 }
+	}
 }
