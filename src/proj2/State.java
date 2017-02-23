@@ -1,16 +1,19 @@
 package proj2;
 
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 
 public class State {
-	HashSet<Position> whites;
-	HashSet<Position> blacks;
+	Deque<Position> whites;
+	Deque<Position> blacks;
 	boolean isWhite;
 	
-	State(HashSet<Position> w, HashSet<Position> b, boolean player) {
+	State(Deque<Position> w, Deque<Position> b, boolean player) {
 		whites = w;
 		blacks = b;
 		isWhite = player;
@@ -93,10 +96,14 @@ public class State {
 	
 	@SuppressWarnings("unchecked")
 	State successorState(Move move) {
-		HashSet<Position> succWhite = new HashSet<Position>();
-		HashSet<Position> succBlack = new HashSet<Position>();
-		succWhite=(HashSet<Position>) whites.clone();
-		succBlack=(HashSet<Position>)blacks.clone();
+		Deque<Position> succWhite = new LinkedList<Position>();
+		Deque<Position> succBlack = new LinkedList<Position>();
+		for(Position p : whites) {
+			succWhite.add(p);
+		}
+		for(Position p: blacks) {
+			succBlack.add(p);
+		}
 		if(isWhite) {
 			if (move.getKill()) { //if the move is a kill move we have to remove the opponent's pawn
 				// find pawn and remove

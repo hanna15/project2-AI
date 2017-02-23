@@ -1,8 +1,12 @@
 package proj2;
 
 
+import java.util.Deque;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Random;
+
+import sun.misc.Queue;
 
 public class RemoteAgent implements Agent {
 	private Random random = new Random();
@@ -21,17 +25,15 @@ public class RemoteAgent implements Agent {
 		myTurn = !role.equals("white");
 		this.width = width;
 		this.height = height;
-		HashSet<Position> whites = new HashSet<Position>();
-		HashSet<Position> blacks = new HashSet<Position>();
-		for (int i = 1; i < this.width+1; i++) {
-			Position posW1 = new Position(i,1);
-			Position posW2 = new Position(i,2);
-			whites.add(posW1);
-			whites.add(posW2);
-			Position posB1 = new Position(i, this.height);
-			Position posB2 = new Position(i, this.height - 1);
-			blacks.add(posB1);
-			blacks.add(posB2);
+		Deque<Position> whites = new LinkedList<Position>();
+		Deque<Position> blacks = new LinkedList<Position>();
+		for (int j = 0; j < 2; j++) {
+			for (int i = 1; i < this.width+1; i++) {
+				Position posW1 = new Position(i,j+1);
+				whites.add(posW1);
+				Position posB1 = new Position(i, height-j);
+				blacks.add(posB1);
+			}
 		}
 		this.currState = new State(whites, blacks, true);
     }
@@ -53,7 +55,6 @@ public class RemoteAgent implements Agent {
    			boolean isKill = x2 != x1;
    			m = new Move(new Position(x1,y1), new Position(x2,y2), isKill);
    			currState = currState.successorState(m);
-   			
     	}
 		
     	// update turn (above that line it myTurn is still for the previous state)
