@@ -13,24 +13,14 @@ public class AlphaBeta {
 	private int envHeight;
 	private State currState;
 	private String myRole;
-	private best best;
 	
-	public class best {
-		int bestVal;
-		Move bestMove;
-		
-		best(int value, Move move) {
-			bestVal = value;
-			bestMove = move;
-		}
-	}
 	
 	AlphaBeta(int w, int h, State curr, String role) {
 		currState = curr;
 		envWidth = w;
 		envHeight = h;
 		myRole = role;
-		best = new best(0, null);
+		//best = new best(0, null);
 	}
 	
 	Move bestMove() { 
@@ -38,7 +28,7 @@ public class AlphaBeta {
 		ArrayList<Move> moves = currState.getAllLegalMoves(envWidth, envHeight);
 		System.out.println("-----------size of legal moves: " + moves.size());
 		// moves should not be empty
-		Move bestMove = maxValue(currState, MIN, MAX, null).bestMove;
+		Move bestMove = maxMove(currState, MIN, MAX);
 		stats.print();
 		if(bestMove == null) {
 			System.out.println("------------ATH! Best move is null -----------------");
@@ -46,48 +36,64 @@ public class AlphaBeta {
 		return bestMove;
 	}
 
-	private best minValue(State s, int alpha_min, int beta_max, Move bestMove) {
-		int value = MAX;
+	private int minValue(State s, int alpha_min, int beta_max) {
+		int bestVal = MAX;
 		if(s.isGoalState(envWidth, envHeight)) { //veit hann potto "who's turn it is ?"
 			//System.out.println("goal state from min : " + s.toString());
-			best.bestVal = utility(s);
-			best.bestMove = bestMove;
-			return best; 
+			bestVal = utility(s);
+			return bestVal; 
 		}
 		for (Move m : s.getAllLegalMoves(envWidth, envHeight)) {
-			value = Math.min(value, maxValue(s.successorState(m), alpha_min, beta_max, m).bestVal);
-			if(value <= alpha_min) {
-				best.bestVal = value;
-				best.bestMove = m;
-				return best;
+			bestVal = Math.min(bestVal, maxValue(s.successorState(m), alpha_min, beta_max));
+			if(bestVal <= alpha_min) {
+				return bestVal;
 			}
-			beta_max = Math.min(beta_max, value);
+			beta_max = Math.min(beta_max, bestVal);
 		}
-		best.bestVal = value;
-		best.bestMove = bestMove;
-		return best;
+		
+		return bestVal;
 	}
 	
-	private best maxValue(State s, int alpha_min, int beta_max, Move bestMove) {
-		int value = MIN;
+	private Move maxMove(State s, int alpha_min, int beta_max) {
+		//best best = new best(MIN, null);
+		Move bestMove = null;
+		int bestVal = MIN;
+		
+		for (Move m : s.getAllLegalMoves(envWidth, envHeight)) {
+			int valFromMin = minValue(s.successorState(m), alpha_min, beta_max);
+			if ( valFromMin > bestVal) {
+				//best.bestVal = valFromMin;
+			    bestMove = m;
+			}
+			//value = Math.max(value, minValue(s.successorState(m), alpha_min, beta_max, m).bestVal);
+			if(bestVal >= beta_max) {
+				return bestMove;
+			}
+			alpha_min = Math.max(alpha_min, bestVal);
+		}
+		return bestMove;
+	}
+	
+    private int maxValue(State s, int alpha_min, int beta_max) {
+		int bestVal = MIN;
+		
 		if(s.isGoalState(envWidth, envHeight)) { //veit hann potto "who's turn it is ?"
 			//System.out.println("goal state from max : " + s.toString());
-			best.bestVal = utility(s);
-			best.bestMove = bestMove;
-			return best; 
+			bestVal = utility(s);
+			return bestVal; 
 		}
 		for (Move m : s.getAllLegalMoves(envWidth, envHeight)) {
-			value = Math.max(value, minValue(s.successorState(m), alpha_min, beta_max, m).bestVal);
-			if(value >= beta_max) {
-				best.bestVal = value;
-				best.bestMove = m;
-				return best;
+			int valFromMin = minValue(s.successorState(m), alpha_min, beta_max);
+			if ( valFromMin > bestVal) {
+				bestVal = valFromMin;
 			}
-			alpha_min = Math.max(alpha_min, value);
+			//value = Math.max(value, minValue(s.successorState(m), alpha_min, beta_max, m).bestVal);
+			if(bestVal >= beta_max) {
+				return bestVal;
+			}
+			alpha_min = Math.max(alpha_min, bestVal);
 		}
-		best.bestVal = value;
-		best.bestMove = bestMove;
-		return best;
+		return bestVal;
 	}
 	
 	private int heuristic(State s) {

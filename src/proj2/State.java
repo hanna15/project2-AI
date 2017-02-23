@@ -17,7 +17,6 @@ public class State {
 	}
 	
 	ArrayList<Move> getAllLegalMoves(int width, int height) {
-		//Set<Move> legalMoves = new HashSet<Move>();
 		ArrayList<Move> legalMoves = new ArrayList<Move>();
 		if(isWhite) {
 			for (Position p : whites) {
@@ -69,12 +68,10 @@ public class State {
 	
 	// TODO: replace goal test with cutoff test that decides when to apply EVAL
 	boolean isGoalState(int width, int height) {
-		/*
 		if(isDraw(width, height)) {
 			//System.out.println("Goal state: its a draw");
 			return true;
 		}
-        */
 		if(isWhite) {
 			for (Position p: whites) {
 				if(p.getY() == height) { //if at least one pawn has reached the end height (whites start at 1)
@@ -117,7 +114,6 @@ public class State {
 			succBlack.add(move.getDest());
 		}
 		State nextState = new State(succWhite, succBlack, !isWhite);
-		//System.out.println("SUCCESSOR STATE: " + nextState);
 		return nextState;
 	}
 	
