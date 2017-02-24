@@ -110,7 +110,8 @@ public class State {
 				succBlack.remove(move.getDest());
 			}
 			succWhite.remove(move.getCurr()); //always update the curr player's pawns
-			succWhite.add(move.getDest());
+			// add the pawn to the front of the queue, so that it will get checked first
+			succWhite.addFirst(move.getDest());
 		}
 		else {
 			if (move.getKill()) { //if the move is a kill move we have to remove the opponent's pawn
@@ -118,7 +119,8 @@ public class State {
 				succWhite.remove(move.getDest());
 			}
 			succBlack.remove(move.getCurr()); //always update the curr player's pawns
-			succBlack.add(move.getDest());
+			// add the pawn to the front of the queue, so that it will get checked first
+			succBlack.addFirst(move.getDest());
 		}
 		State nextState = new State(succWhite, succBlack, !isWhite);
 		return nextState;
