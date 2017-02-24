@@ -73,8 +73,8 @@ public class RemoteAgent implements Agent {
 			//return m.toString();
 			
 			// Create the minimax search
-			AlphaBeta ABsearch = new AlphaBeta(this.width, this.height, currState, role);
-	        Move nextMove = ABsearch.bestMove();
+			AlphaBeta ABsearch = new AlphaBeta(this.width, this.height, currState, role, playclock);
+	        Move nextMove = ABsearch.iterativeDeapening();
 	        return nextMove.toString();
 		} 
 		else {
