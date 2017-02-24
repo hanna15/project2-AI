@@ -9,8 +9,8 @@ import java.util.Queue;
 import java.util.Set;
 
 public class State {
-	Deque<Position> whites;
-	Deque<Position> blacks;
+	Queue<Position> whites;
+	Queue<Position> blacks;
 	boolean isWhite;
 	
 	State(Deque<Position> w, Deque<Position> b, boolean player) {

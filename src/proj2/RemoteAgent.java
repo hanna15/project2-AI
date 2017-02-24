@@ -27,11 +27,11 @@ public class RemoteAgent implements Agent {
 		this.height = height;
 		Deque<Position> whites = new LinkedList<Position>();
 		Deque<Position> blacks = new LinkedList<Position>();
-		for (int j = 0; j < 2; j++) {
+		for (int j = 2; j > 0; j--) {
 			for (int i = 1; i < this.width+1; i++) {
-				Position posW1 = new Position(i,j+1);
+				Position posW1 = new Position(i,j);
 				whites.add(posW1);
-				Position posB1 = new Position(i, height-j);
+				Position posB1 = new Position(i, height+1-j);
 				blacks.add(posB1);
 			}
 		}
