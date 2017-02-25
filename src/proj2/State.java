@@ -19,22 +19,22 @@ public class State {
 		isWhite = player;
 	}
 	
-	ArrayList<Move> getAllLegalMoves(int width, int height) {
+	ArrayList<Move> getAllLegalMoves(byte width, byte height) {
 		ArrayList<Move> legalMoves = new ArrayList<Move>();
 		if(isWhite) {
 			for (Position p : whites) {
 				//try go forward
-				Position forwPos = new Position(p.getX(), p.getY() + 1);
+				Position forwPos = new Position(p.getX(), (byte)(p.getY() + 1));
 				if(legalPosition(forwPos, width, height) && !whites.contains(forwPos) && !blacks.contains(forwPos)) {
 					legalMoves.add(new Move(p, forwPos, false));
 				}
 				//try kill left
-				Position leftPos = new Position(p.getX() - 1, p.getY() + 1);
+				Position leftPos = new Position((byte)(p.getX() - 1), (byte)(p.getY() + 1));
 				if(legalPosition(leftPos, width, height) && blacks.contains(leftPos)) {
 					legalMoves.add(new Move(p, leftPos, true));
 				}
 				//try kill right
-				Position rightPos = new Position(p.getX() + 1, p.getY() + 1);
+				Position rightPos = new Position((byte)(p.getX() + 1), (byte)(p.getY() + 1));
 				if(legalPosition(rightPos, width, height) && blacks.contains(rightPos)) {
 					legalMoves.add(new Move(p, rightPos, true));
 				}
@@ -43,17 +43,17 @@ public class State {
 		else {
 			for (Position p : blacks) {
 				//try go forward
-				Position forwPos = new Position(p.getX(), p.getY() - 1);
+				Position forwPos = new Position(p.getX(), (byte)(p.getY() - 1));
 				if(legalPosition(forwPos, width, height) && !whites.contains(forwPos) && !blacks.contains(forwPos)) {
 					legalMoves.add(new Move(p, forwPos, false));
 				}
 				//try kill left
-				Position leftPos = new Position(p.getX() + 1, p.getY() - 1);
+				Position leftPos = new Position((byte)(p.getX() + 1), (byte)(p.getY() - 1));
 				if(legalPosition(leftPos, width, height) && whites.contains(leftPos)) {
 					legalMoves.add(new Move(p, leftPos, true));
 				}
 				//try kill right
-				Position rightPos = new Position(p.getX() - 1, p.getY() - 1);
+				Position rightPos = new Position((byte)(p.getX() - 1), (byte)(p.getY() - 1));
 				if(legalPosition(rightPos, width, height) && whites.contains(rightPos)) {
 					legalMoves.add(new Move(p, rightPos, true));
 				}
@@ -70,7 +70,7 @@ public class State {
 	}
 	
 	// TODO: replace goal test with cutoff test that decides when to apply EVAL
-	boolean isGoalState(int width, int height) {
+	boolean isGoalState(byte width, byte height) {
 		if(isDraw(width, height)) {
 			//System.out.println("Goal state: its a draw");
 			return true;
@@ -138,7 +138,7 @@ public class State {
 		return 100 - (50 - distWToH + distBTo1);
 	}
 	
-	public boolean isDraw(int width, int height) {
+	public boolean isDraw(byte width, byte height) {
 		ArrayList<Move> myMoves = getAllLegalMoves(width, height);
 		boolean pawnsEmpty = false;
 		if (isWhite) {

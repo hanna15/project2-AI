@@ -13,8 +13,9 @@ public class RemoteAgent implements Agent {
 	private String role; // the name of this agent's role (white or black)
 	private int playclock; // this is how much time (in seconds) we have before nextAction needs to return a move
 	private boolean myTurn; // whether it is this agent's turn or not
-	private int width, height; // dimensions of the board
+	private byte width, height; // dimensions of the board
 	private State currState;
+	private AlphaBeta AB;
 	
 	/*
 		init(String role, int playclock) is called once before you have to select the first action. Use it to initialize the agent. role is either "white" or "black" and playclock is the number of seconds after which nextAction must return.
@@ -23,17 +24,16 @@ public class RemoteAgent implements Agent {
     	this.role = role;
 		this.playclock = playclock;
 		myTurn = !role.equals("white");
-		this.width = width;
-		this.height = height;
+		this.width = (byte)width;
+		this.height = (byte)height;
 		Deque<Position> whites = new LinkedList<Position>();
 		Deque<Position> blacks = new LinkedList<Position>();
-		for (int j = 2; j > 0; j--) {
-			for (int i = 1; i < this.width+1; i++) {
-				Position posW1 = new Position(i,j);
-				whites.add(posW1);
-				Position posB1 = new Position(i, height+1-j);
-				blacks.add(posB1);
-			}
+		// 
+		for (byte i = 1; i <= this.width; i++) {
+			whites.add(new Position(i, (byte)1));
+			whites.add(new Position(i, (byte)2));
+			blacks.add(new Position(i, this.height));
+			blacks.add(new Position(i, (byte)(this.height-1)));
 		}
 		this.currState = new State(whites, blacks, true);
     }
@@ -43,38 +43,38 @@ public class RemoteAgent implements Agent {
     public String nextAction(int[] lastMove) {
     	Move m = null;
     	if (lastMove != null) {
-    		int x1 = lastMove[0], y1 = lastMove[1], x2 = lastMove[2], y2 = lastMove[3];
+    		byte 	x1 = (byte)lastMove[0],
+    				y1 = (byte)lastMove[1], 
+    				x2 = (byte)lastMove[2], 
+    				y2 = (byte)lastMove[3];
+    		
     		String roleOfLastPlayer;
     		if (myTurn && role.equals("white") || !myTurn && role.equals("black")) {
     			roleOfLastPlayer = "white";
-    		} else {
+    		} 
+    		else {
     			roleOfLastPlayer = "black";
     		}
+    		
    			System.out.println(roleOfLastPlayer + " moved from " + x1 + "," + y1 + " to " + x2 + "," + y2);
-    		// TODO: 1. update your internal world model according to the action that was just executed
-   			boolean isKill = x2 != x1;
+   			
+   			boolean isKill = (x2 != x1); // if moved diagonally, the move must be a kill
+   			
    			m = new Move(new Position(x1,y1), new Position(x2,y2), isKill);
-   			currState = currState.successorState(m);
+   			currState = currState.successorState(m); // update the current state
     	}
 		
     	// update turn (above that line it myTurn is still for the previous state)
 		myTurn = !myTurn;
-		if (myTurn ) {
-			// ATH!!
+		if (myTurn) {
+			// check if goalstate
 			if (currState.isGoalState(width, height)) {
 				return m.toString();
 			}
-			// TODO: 2. run alpha-beta search to determine the best move
-			// Here we just construct a random move (that will most likely not even be possible),
-			// this needs to be replaced with the actual best move.
-			
-			//ArrayList<Move> legalMoves = currState.getAllLegalMoves(width, height);
-			//Move m = legalMoves.get(random.nextInt(legalMoves.size()));
-			//return m.toString();
 			
 			// Create the minimax search
-			AlphaBeta ABsearch = new AlphaBeta(this.width, this.height, currState, role, playclock);
-	        Move nextMove = ABsearch.iterativeDeapening();
+			AB = new AlphaBeta(this.width, this.height, currState, role, playclock);
+	        Move nextMove = AB.iterativeDeepening();
 	        return nextMove.toString();
 		} 
 		else {

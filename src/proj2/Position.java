@@ -1,11 +1,10 @@
 package proj2;
 
 public class Position {
+    private byte x;
+    private byte y;
 
-    private int x;
-    private int y;
-
-    public Position(int x, int y) {
+    public Position(byte x, byte y) {
         this.x = x; this.y = y;
     }
 
@@ -13,11 +12,11 @@ public class Position {
         return "(" + x + ", " + y + ")";
     }
     
-    public int getX() {
+    public byte getX() {
     	return x;
     }
     
-    public int getY() {
+    public byte getY() {
     	return y;
     }
     
