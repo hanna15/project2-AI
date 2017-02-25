@@ -6,8 +6,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Random;
 
-import sun.misc.Queue;
-
 public class RemoteAgent implements Agent {
 	private Random random = new Random();
 	private String role; // the name of this agent's role (white or black)

@@ -214,7 +214,7 @@ public class AlphaBeta {
 		return orderedMoves;
     }
     
-	private int heuristic(State s) {
+	private int heuristic1(State s) {
 		int whiteDist = envHeight;
 		int blackDist = 1;
 		for (Position p : s.whites) {
@@ -237,6 +237,34 @@ public class AlphaBeta {
 			return 50 + whiteDist - blackDist;
 		}
 	}
+	
+    
+	private int heuristic(State s) {
+		int whiteDist = envHeight;
+		int blackDist = 1;
+		int whiteSize = s.whites.size();
+		int blackSize = s.blacks.size();
+		for (Position p : s.whites) {
+			if(p.getY() < whiteDist) {
+				whiteDist = envHeight - p.getY();
+			}
+		}
+		
+		for (Position p : s.blacks) {
+			if(p.getY() > blackDist) {
+				blackDist = p.getY();
+			}
+		}
+		
+		if (s.isWhite) {
+			return 50 - whiteDist + blackDist + (whiteSize - blackSize);
+		}
+		
+		else {
+			return 50 + whiteDist - blackDist + (blackSize - whiteSize);
+		}
+	}
+	
 	
 	private int utility(State s) {
 		if (s.isWhite && myRole.equals("white") || !s.isWhite && myRole.equals("black")) { //if we are the winners
