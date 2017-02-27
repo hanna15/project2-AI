@@ -33,37 +33,35 @@ public class AlphaBeta {
 	}
 	
 	AlphaBeta(byte w, byte h, State curr, String role, int playclock) {
-//		board_values = new int[][]{
-//			  { 5, 15, 15, 5, 5, 15, 15, 5 },
-//			  { 2, 3, 3, 3, 3, 3, 3, 2 },
-//			  { 4, 6, 6, 6, 6, 6, 6, 4 },
-//			  { 7, 10, 10, 10, 10, 10, 10, 7 },
-//			  { 11, 15, 15, 15, 15, 15, 15, 11 },
-//			  { 16, 21, 21, 21, 21, 21, 21, 16 },
-//			  { 20, 28, 28, 28, 28, 28, 28, 20 },
-//			  { 36, 36, 36, 36, 36, 36, 36, 36 }
-//		};
-		board_values = new int[][]{
-				  { 10, 15, 10, 15, 10 },
-				  { 4, 6, 6, 6, 4 },
-				  { 16, 21, 21, 21, 16 },
-				  { 20, 28, 28, 28, 20 },
-				  { 30, 30, 30, 30, 30 }
-			};
-//		
-//		board_values = new int[][]{
-//				  { 10, 15, 10 },
-//				  { 4, 6, 4 },
-//				  { 16, 21, 16 },
-//				  { 20, 28, 20 },
-//				  { 30, 30, 30 }
-//			};
+		// Initialize the board values array
+		board_values = new int[h][w];
+		for (int i = 0; i < h; i++) {
+			for (int j = 0; j < w; j++) {
+				if (i == 0 || i == h-1) {
+					board_values[i][j] = 15; 
+				}
+				else if (j == 0 || j == w-1) {
+					board_values[i][j] = 5;
+				}
+				else {
+					board_values[i][j] = 10;
+				}
+			}
+		}
+		// print out boards values
+//		for (int i = 0; i < h; i++) {
+//			for (int j = 0; j < w; j++) {
+//				System.out.print(board_values[i][j] + " ");
+//			}
+//			System.out.println();
+//		}
+
 		currState = curr;
 		envWidth = w;
 		envHeight = h;
 		myRole = role;
 		playClock = playclock;
-		breakClock = (playClock*1000) - 300;
+		breakClock = (playClock*1000) - 100;
 	}
 	
 	public Move iterativeDeepening() {
@@ -82,6 +80,7 @@ public class AlphaBeta {
 					return p.bestMove;
 				}
 			} catch(TimeExpired e) {
+				stats.print();
 				System.out.println(">>>>>>>>>>> Timed out.");
 				return bestMove;
 			}
@@ -116,10 +115,11 @@ public class AlphaBeta {
 		
 		// sort the moves based on which pawn can kill right away
 		ArrayList<Move> orderedMoves = sortArrayList(s.getAllLegalMoves(envWidth, envHeight), s.isWhite);
-		System.out.println("Sorted legalMoves: " + orderedMoves + " depth: " + depth_limit);
+		//System.out.println("Sorted legalMoves: " + orderedMoves + " depth: " + depth_limit);
 
 		for (Move m : orderedMoves) {
 			//System.out.println("maxMove(): " + orderedMoves + " bestVal: " + bestVal +", alpha: " + alpha_min + ", beta:" + beta_max);
+			stats.increaseExpansions();
 			int valFromMin = minValue(s.successorState(m), alpha_min, beta_max, depth_limit - 1);
 			if ( valFromMin > bestVal) {
 				//System.out.println("maxMove( if valfromMin > bestVal" + valFromMin);
@@ -160,6 +160,7 @@ public class AlphaBeta {
 		
 		for (Move m : orderedMoves) {
 			//System.out.println("minValue(): " + orderedMoves + " bestVal: " + bestVal +", alpha: " + alpha_min + ", beta:" + beta_max);
+			stats.increaseExpansions();
 			int valFromMax = maxValue(s.successorState(m), alpha_min, beta_max, depth_limit - 1);
 			if (valFromMax < bestVal) {
 				bestVal = valFromMax;
@@ -196,6 +197,7 @@ public class AlphaBeta {
 		
 		for (Move m : orderedMoves) {
 			//System.out.println("maxValue(): " + orderedMoves + " bestVal: " + bestVal +", alpha: " + alpha_min + ", beta:" + beta_max);
+			stats.increaseExpansions();
 			int valFromMin = minValue(s.successorState(m), alpha_min, beta_max, depth_limit - 1);
 			
 			if (valFromMin > bestVal) {
@@ -231,11 +233,13 @@ public class AlphaBeta {
 //							return -1;
 //						}
 //					}
-//					return 0;
 		        	if (isWhite) {
 		        		
 		        		//System.out.println("Y " + (m1.getNewY()-1) + " X: " + (m1.getNewX()-1));
-		        		if (board_values[m1.getNewY()-1][m1.getNewX()-1] < board_values[m2.getNewY()-1][m2.getNewX()-1]) {
+						if (m1.getNewY() > m2.getNewY()) {
+							return -1;
+						}
+						else if (board_values[m1.getNewY()-1][m1.getNewX()-1] < board_values[m2.getNewY()-1][m2.getNewX()-1]) {
 		        			return 1;
 		        		}
 		        		else if (board_values[m1.getNewY()-1][m1.getNewX()-1] > board_values[m2.getNewY()-1][m2.getNewX()-1]) {
@@ -244,11 +248,14 @@ public class AlphaBeta {
 		        		else return 0;
 		        	}
 		        	else {
-		        		if (board_values[m1.getNewY()-1][m1.getNewX()-1] < board_values[m2.getNewY()-1][m2.getNewX()-1]) {
-		        			return -1;
+						if (m1.getNewY() < m2.getNewY()) {
+							return -1;
+						}
+						else if (board_values[m1.getNewY()-1][m1.getNewX()-1] < board_values[m2.getNewY()-1][m2.getNewX()-1]) {
+		        			return 1;
 		        		}
 		        		else if (board_values[m1.getNewY()-1][m1.getNewX()-1] > board_values[m2.getNewY()-1][m2.getNewX()-1]) {
-		        			return 1;
+		        			return -1;
 		        		}
 		        		else return 0;
 		        	}
