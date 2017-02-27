@@ -19,11 +19,13 @@ public class AlphaBeta {
 	private State currState;
 	private String myRole;
 	private int playClock;
-	private int DEPTH = 15;
+	private int DEPTH = 100;
 	private long startClock;
 	private long breakClock;
+	public int[][] board_values;
 	
 	public class TimeExpired extends Exception{};
+	
 	
 	public class Pair {
 		int bestValue = MIN;
@@ -31,6 +33,31 @@ public class AlphaBeta {
 	}
 	
 	AlphaBeta(byte w, byte h, State curr, String role, int playclock) {
+//		board_values = new int[][]{
+//			  { 5, 15, 15, 5, 5, 15, 15, 5 },
+//			  { 2, 3, 3, 3, 3, 3, 3, 2 },
+//			  { 4, 6, 6, 6, 6, 6, 6, 4 },
+//			  { 7, 10, 10, 10, 10, 10, 10, 7 },
+//			  { 11, 15, 15, 15, 15, 15, 15, 11 },
+//			  { 16, 21, 21, 21, 21, 21, 21, 16 },
+//			  { 20, 28, 28, 28, 28, 28, 28, 20 },
+//			  { 36, 36, 36, 36, 36, 36, 36, 36 }
+//		};
+		board_values = new int[][]{
+				  { 10, 15, 10, 15, 10 },
+				  { 4, 6, 6, 6, 4 },
+				  { 16, 21, 21, 21, 16 },
+				  { 20, 28, 28, 28, 20 },
+				  { 30, 30, 30, 30, 30 }
+			};
+//		
+//		board_values = new int[][]{
+//				  { 10, 15, 10 },
+//				  { 4, 6, 4 },
+//				  { 16, 21, 16 },
+//				  { 20, 28, 20 },
+//				  { 30, 30, 30 }
+//			};
 		currState = curr;
 		envWidth = w;
 		envHeight = h;
@@ -50,6 +77,7 @@ public class AlphaBeta {
 				bestMove = p.bestMove;
 				
 				if (p.bestValue == 0 || p.bestValue == 100) {
+					stats.print();
 					System.out.println(">>>>>>>>>> GOING ALL THE WAY!!!");
 					return p.bestMove;
 				}
@@ -88,7 +116,7 @@ public class AlphaBeta {
 		
 		// sort the moves based on which pawn can kill right away
 		ArrayList<Move> orderedMoves = sortArrayList(s.getAllLegalMoves(envWidth, envHeight), s.isWhite);
-
+		System.out.println("Sorted legalMoves: " + orderedMoves + " depth: " + depth_limit);
 
 		for (Move m : orderedMoves) {
 			//System.out.println("maxMove(): " + orderedMoves + " bestVal: " + bestVal +", alpha: " + alpha_min + ", beta:" + beta_max);
@@ -193,17 +221,37 @@ public class AlphaBeta {
 		        	return -1;
 		        }
 		        else if ((m1.getKill() && m2.getKill()) || !(m1.getKill() && m2.getKill())) {
-					if (isWhite) {
-						if (m1.getNewY() > m2.getNewY()) {
-							return 1;
-						}
-					}
-					else {
-						if (m1.getNewY() < m2.getNewY()) {
-							return 1;
-						}
-					}
-		        	return 0;
+//					if (isWhite) {
+//						if (m1.getNewY() > m2.getNewY()) {
+//							return -1;
+//						}
+//					}
+//					else {
+//						if (m1.getNewY() < m2.getNewY()) {
+//							return -1;
+//						}
+//					}
+//					return 0;
+		        	if (isWhite) {
+		        		
+		        		//System.out.println("Y " + (m1.getNewY()-1) + " X: " + (m1.getNewX()-1));
+		        		if (board_values[m1.getNewY()-1][m1.getNewX()-1] < board_values[m2.getNewY()-1][m2.getNewX()-1]) {
+		        			return 1;
+		        		}
+		        		else if (board_values[m1.getNewY()-1][m1.getNewX()-1] > board_values[m2.getNewY()-1][m2.getNewX()-1]) {
+		        			return -1;
+		        		}
+		        		else return 0;
+		        	}
+		        	else {
+		        		if (board_values[m1.getNewY()-1][m1.getNewX()-1] < board_values[m2.getNewY()-1][m2.getNewX()-1]) {
+		        			return -1;
+		        		}
+		        		else if (board_values[m1.getNewY()-1][m1.getNewX()-1] > board_values[m2.getNewY()-1][m2.getNewX()-1]) {
+		        			return 1;
+		        		}
+		        		else return 0;
+		        	}
 		        }
 		        else {
 		        	return 1;
@@ -214,7 +262,7 @@ public class AlphaBeta {
 		return orderedMoves;
     }
     
-	private int heuristic1(State s) {
+	private int heuristic(State s) {
 		int whiteDist = envHeight;
 		int blackDist = 1;
 		for (Position p : s.whites) {
@@ -239,29 +287,31 @@ public class AlphaBeta {
 	}
 	
     
-	private int heuristic(State s) {
-		int whiteDist = envHeight;
-		int blackDist = 1;
+	private int heuristic1(State s) {
+		int whiteDistToGoal = envHeight;
+		int blackDistToGoal = 1;
 		int whiteSize = s.whites.size();
 		int blackSize = s.blacks.size();
+		
+		
 		for (Position p : s.whites) {
-			if(p.getY() < whiteDist) {
-				whiteDist = envHeight - p.getY();
+			if((envHeight-p.getY()) < whiteDistToGoal) {
+				whiteDistToGoal = envHeight - p.getY();
 			}
 		}
 		
 		for (Position p : s.blacks) {
-			if(p.getY() > blackDist) {
-				blackDist = p.getY();
+			if((envHeight-p.getY()) > blackDistToGoal) {
+				blackDistToGoal = p.getY();
 			}
 		}
 		
 		if (s.isWhite) {
-			return 50 - whiteDist + blackDist + (whiteSize - blackSize);
+			return (50 - whiteDistToGoal + blackDistToGoal) + (whiteSize + (whiteSize - blackSize));
 		}
 		
 		else {
-			return 50 + whiteDist - blackDist + (blackSize - whiteSize);
+			return (50 + whiteDistToGoal - blackDistToGoal) - (blackSize + (blackSize - whiteSize));
 		}
 	}
 	
